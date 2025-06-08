@@ -173,8 +173,27 @@ if env["platform"] == "macos":
         env.Append(CCFLAGS=["-mmacosx-version-min=10.13"])
         env.Append(LINKFLAGS=["-mmacosx-version-min=10.13"])
 elif env["platform"] == "windows":
-    env.AppendUnique(CPPDEFINES=["WINVER=0x0603", "_WIN32_WINNT=0x0603"])
+    env.AppendUnique(CPPDEFINES=["WINVER=0x0A00", "_WIN32_WINNT=0x0A00"])
 
+if env["arch"] == "x86_64":
+    # On 64-bit x86, enable SSE 4.2 and prior instruction sets (SSE3/SSSE3/SSE4/SSE4.1) to improve performance.
+    # This is supported on most CPUs released after 2009-2011 (Intel Nehalem, AMD Bulldozer).
+    # AVX and AVX2 aren't enabled because they aren't available on more recent low-end Intel CPUs.
+    if env.get("is_msvc", False):
+        # https://stackoverflow.com/questions/64053597/how-do-i-enable-sse4-1-and-sse3-but-not-avx-in-msvc/69328426
+        env.Append(CCFLAGS=["/d2archSSE42"])
+    else:
+        # `-msse2` is implied when compiling for x86_64.
+        env.Append(CCFLAGS=["-msse4.2"])
+elif env["arch"] == "x86_32":
+    # Be more conservative with instruction sets on 32-bit x86 to improve compatibility.
+    # SSE and SSE2 are present on all CPUs that support 64-bit, even if running a 32-bit OS.
+    if env.get("is_msvc", False):
+        env.Append(CCFLAGS=["/arch:SSE2"])
+    else:
+        # Use `-mfpmath=sse` to use SSE for floating-point math, which is more stable than x87.
+        # `-mstackrealign` is needed for it to work.
+        env.Append(CCFLAGS=["-msse2", "-mfpmath=sse", "-mstackrealign"])
 
 scons_cache_path = os.environ.get("SCONS_CACHE")
 if scons_cache_path is not None:
@@ -185,12 +204,10 @@ angle_sources = [
     "angle/src/common/CompiledShaderState.cpp",
     "angle/src/common/Float16ToFloat32.cpp",
     "angle/src/common/MemoryBuffer.cpp",
-    "angle/src/common/PackedCLEnums_autogen.cpp",
     "angle/src/common/PackedEGLEnums_autogen.cpp",
     "angle/src/common/PackedEnums.cpp",
     "angle/src/common/PackedGLEnums_autogen.cpp",
     "angle/src/common/PoolAlloc.cpp",
-    "angle/src/common/RingBufferAllocator.cpp",
     "angle/src/common/SimpleMutex.cpp",
     "angle/src/common/WorkerThread.cpp",
     "angle/src/common/aligned_memory.cpp",
@@ -237,13 +254,14 @@ angle_sources = [
     "angle/src/compiler/translator/FunctionLookup.cpp",
     "angle/src/compiler/translator/HashNames.cpp",
     "angle/src/compiler/translator/ImmutableStringBuilder.cpp",
-    "angle/src/compiler/translator/ImmutableString_ESSL_autogen.cpp",
+    "angle/src/compiler/translator/ImmutableString_autogen.cpp",
     "angle/src/compiler/translator/InfoSink.cpp",
     "angle/src/compiler/translator/Initialize.cpp",
     "angle/src/compiler/translator/InitializeDll.cpp",
     "angle/src/compiler/translator/IntermNode.cpp",
     "angle/src/compiler/translator/IntermRebuild.cpp",
     "angle/src/compiler/translator/IsASTDepthBelowLimit.cpp",
+    "angle/src/compiler/translator/Name.cpp",
     "angle/src/compiler/translator/Operator.cpp",
     "angle/src/compiler/translator/OutputTree.cpp",
     "angle/src/compiler/translator/ParseContext.cpp",
@@ -253,7 +271,7 @@ angle_sources = [
     "angle/src/compiler/translator/ShaderVars.cpp",
     "angle/src/compiler/translator/Symbol.cpp",
     "angle/src/compiler/translator/SymbolTable.cpp",
-    "angle/src/compiler/translator/SymbolTable_ESSL_autogen.cpp",
+    "angle/src/compiler/translator/SymbolTable_autogen.cpp",
     "angle/src/compiler/translator/SymbolUniqueId.cpp",
     "angle/src/compiler/translator/Types.cpp",
     "angle/src/compiler/translator/ValidateAST.cpp",
@@ -293,30 +311,31 @@ angle_sources = [
     "angle/src/compiler/translator/tree_ops/MonomorphizeUnsupportedFunctions.cpp",
     "angle/src/compiler/translator/tree_ops/PreTransformTextureCubeGradDerivatives.cpp",
     "angle/src/compiler/translator/tree_ops/PruneEmptyCases.cpp",
+    "angle/src/compiler/translator/tree_ops/PruneInfiniteLoops.cpp",
     "angle/src/compiler/translator/tree_ops/PruneNoOps.cpp",
     "angle/src/compiler/translator/tree_ops/RecordConstantPrecision.cpp",
+    "angle/src/compiler/translator/tree_ops/ReduceInterfaceBlocks.cpp",
     "angle/src/compiler/translator/tree_ops/RemoveArrayLengthMethod.cpp",
     "angle/src/compiler/translator/tree_ops/RemoveAtomicCounterBuiltins.cpp",
     "angle/src/compiler/translator/tree_ops/RemoveDynamicIndexing.cpp",
     "angle/src/compiler/translator/tree_ops/RemoveInactiveInterfaceVariables.cpp",
     "angle/src/compiler/translator/tree_ops/RemoveInvariantDeclaration.cpp",
     "angle/src/compiler/translator/tree_ops/RemoveUnreferencedVariables.cpp",
+    "angle/src/compiler/translator/tree_ops/RemoveUnusedFramebufferFetch.cpp",
     "angle/src/compiler/translator/tree_ops/RescopeGlobalVariables.cpp",
     "angle/src/compiler/translator/tree_ops/RewriteArrayOfArrayOfOpaqueUniforms.cpp",
     "angle/src/compiler/translator/tree_ops/RewriteAtomicCounters.cpp",
-    "angle/src/compiler/translator/tree_ops/RewriteCubeMapSamplersAs2DArray.cpp",
     "angle/src/compiler/translator/tree_ops/RewriteDfdy.cpp",
     "angle/src/compiler/translator/tree_ops/RewritePixelLocalStorage.cpp",
     "angle/src/compiler/translator/tree_ops/RewriteStructSamplers.cpp",
     "angle/src/compiler/translator/tree_ops/RewriteTexelFetchOffset.cpp",
+    "angle/src/compiler/translator/tree_ops/ScalarizeVecAndMatConstructorArgs.cpp",
     "angle/src/compiler/translator/tree_ops/SeparateDeclarations.cpp",
-    "angle/src/compiler/translator/tree_ops/SeparateStructFromFunctionDeclarations.cpp",
     "angle/src/compiler/translator/tree_ops/SeparateStructFromUniformDeclarations.cpp",
     "angle/src/compiler/translator/tree_ops/SimplifyLoopConditions.cpp",
     "angle/src/compiler/translator/tree_ops/SplitSequenceOperator.cpp",
     "angle/src/compiler/translator/tree_ops/glsl/RegenerateStructNames.cpp",
     "angle/src/compiler/translator/tree_ops/glsl/RewriteRepeatedAssignToSwizzled.cpp",
-    "angle/src/compiler/translator/tree_ops/glsl/ScalarizeVecAndMatConstructorArgs.cpp",
     "angle/src/compiler/translator/tree_ops/glsl/UseInterfaceBlockFields.cpp",
     "angle/src/compiler/translator/tree_util/DriverUniform.cpp",
     "angle/src/compiler/translator/tree_util/FindFunction.cpp",
@@ -338,24 +357,11 @@ angle_sources = [
     "angle/src/libANGLE/AttributeMap.cpp",
     "angle/src/libANGLE/BlobCache.cpp",
     "angle/src/libANGLE/Buffer.cpp",
-    "angle/src/libANGLE/CLBuffer.cpp",
-    "angle/src/libANGLE/CLCommandQueue.cpp",
-    "angle/src/libANGLE/CLContext.cpp",
-    "angle/src/libANGLE/CLDevice.cpp",
-    "angle/src/libANGLE/CLEvent.cpp",
-    "angle/src/libANGLE/CLImage.cpp",
-    "angle/src/libANGLE/CLKernel.cpp",
-    "angle/src/libANGLE/CLMemory.cpp",
-    "angle/src/libANGLE/CLObject.cpp",
-    "angle/src/libANGLE/CLPlatform.cpp",
-    "angle/src/libANGLE/CLProgram.cpp",
-    "angle/src/libANGLE/CLSampler.cpp",
     "angle/src/libANGLE/Caps.cpp",
     "angle/src/libANGLE/Compiler.cpp",
     "angle/src/libANGLE/Config.cpp",
     "angle/src/libANGLE/Context.cpp",
     "angle/src/libANGLE/ContextMutex.cpp",
-    "angle/src/libANGLE/Context_gl.cpp",
     "angle/src/libANGLE/Context_gles_1_0.cpp",
     "angle/src/libANGLE/Debug.cpp",
     "angle/src/libANGLE/Device.cpp",
@@ -405,18 +411,12 @@ angle_sources = [
     "angle/src/libANGLE/VertexArray.cpp",
     "angle/src/libANGLE/VertexAttribute.cpp",
     "angle/src/libANGLE/angletypes.cpp",
-    "angle/src/libANGLE/cl_utils.cpp",
-    "angle/src/libANGLE/context_private_call_gl.cpp",
-    "angle/src/libANGLE/context_private_call_gles.cpp",
-    "angle/src/libANGLE/entry_points_utils.cpp",
     "angle/src/libANGLE/es3_copy_conversion_table_autogen.cpp",
     "angle/src/libANGLE/format_map_autogen.cpp",
-    "angle/src/libANGLE/format_map_desktop.cpp",
     "angle/src/libANGLE/formatutils.cpp",
     "angle/src/libANGLE/gles_extensions_autogen.cpp",
     "angle/src/libANGLE/queryconversions.cpp",
     "angle/src/libANGLE/queryutils.cpp",
-    "angle/src/libANGLE/validationCL.cpp",
     "angle/src/libANGLE/validationEGL.cpp",
     "angle/src/libANGLE/validationES.cpp",
     "angle/src/libANGLE/validationES1.cpp",
@@ -425,23 +425,9 @@ angle_sources = [
     "angle/src/libANGLE/validationES31.cpp",
     "angle/src/libANGLE/validationES32.cpp",
     "angle/src/libANGLE/validationESEXT.cpp",
-    "angle/src/libANGLE/validationGL1.cpp",
-    "angle/src/libANGLE/validationGL2.cpp",
-    "angle/src/libANGLE/validationGL3.cpp",
-    "angle/src/libANGLE/validationGL4.cpp",
     "angle/src/libANGLE/capture/FrameCapture_mock.cpp",
     "angle/src/libANGLE/capture/serialize_mock.cpp",
     "angle/src/libANGLE/renderer/BufferImpl.cpp",
-    "angle/src/libANGLE/renderer/CLCommandQueueImpl.cpp",
-    "angle/src/libANGLE/renderer/CLContextImpl.cpp",
-    "angle/src/libANGLE/renderer/CLDeviceImpl.cpp",
-    "angle/src/libANGLE/renderer/CLEventImpl.cpp",
-    "angle/src/libANGLE/renderer/CLExtensions.cpp",
-    "angle/src/libANGLE/renderer/CLKernelImpl.cpp",
-    "angle/src/libANGLE/renderer/CLMemoryImpl.cpp",
-    "angle/src/libANGLE/renderer/CLPlatformImpl.cpp",
-    "angle/src/libANGLE/renderer/CLProgramImpl.cpp",
-    "angle/src/libANGLE/renderer/CLSamplerImpl.cpp",
     "angle/src/libANGLE/renderer/ContextImpl.cpp",
     "angle/src/libANGLE/renderer/DeviceImpl.cpp",
     "angle/src/libANGLE/renderer/DisplayImpl.cpp",
@@ -509,13 +495,6 @@ if env["platform"] == "ios":
         "angle/src/common/system_utils_ios.mm",
         "angle/src/gpu_info_util/SystemInfo_ios.cpp",
         "angle/src/libANGLE/renderer/driver_utils_ios.mm",
-        "angle/src/libANGLE/renderer/gl/eagl/ContextEAGL.cpp",
-        "angle/src/libANGLE/renderer/gl/eagl/DeviceEAGL.cpp",
-        "angle/src/libANGLE/renderer/gl/eagl/DisplayEAGL.mm",
-        "angle/src/libANGLE/renderer/gl/eagl/FunctionsEAGL.mm",
-        "angle/src/libANGLE/renderer/gl/eagl/IOSurfaceSurfaceEAGL.mm",
-        "angle/src/libANGLE/renderer/gl/eagl/PbufferSurfaceEAGL.cpp",
-        "angle/src/libANGLE/renderer/gl/eagl/WindowSurfaceEAGL.mm",
     ]
 if env["platform"] == "macos" or env["platform"] == "ios":
     angle_sources += [
@@ -532,7 +511,6 @@ if env["platform"] == "macos" or env["platform"] == "ios":
         "angle/src/compiler/translator/msl/MapFunctionsToDefinitions.cpp",
         "angle/src/compiler/translator/msl/MapSymbols.cpp",
         "angle/src/compiler/translator/msl/ModifyStruct.cpp",
-        "angle/src/compiler/translator/msl/Name.cpp",
         "angle/src/compiler/translator/msl/Pipeline.cpp",
         "angle/src/compiler/translator/msl/ProgramPrelude.cpp",
         "angle/src/compiler/translator/msl/RewritePipelines.cpp",
@@ -551,14 +529,11 @@ if env["platform"] == "macos" or env["platform"] == "ios":
         "angle/src/compiler/translator/tree_ops/msl/GuardFragDepthWrite.cpp",
         "angle/src/compiler/translator/tree_ops/msl/HoistConstants.cpp",
         "angle/src/compiler/translator/tree_ops/msl/IntroduceVertexIndexID.cpp",
-        "angle/src/compiler/translator/tree_ops/msl/NameEmbeddedUniformStructsMetal.cpp",
-        "angle/src/compiler/translator/tree_ops/msl/ReduceInterfaceBlocks.cpp",
         "angle/src/compiler/translator/tree_ops/msl/RewriteCaseDeclarations.cpp",
         "angle/src/compiler/translator/tree_ops/msl/RewriteInterpolants.cpp",
         "angle/src/compiler/translator/tree_ops/msl/RewriteOutArgs.cpp",
         "angle/src/compiler/translator/tree_ops/msl/RewriteUnaddressableReferences.cpp",
         "angle/src/compiler/translator/tree_ops/msl/SeparateCompoundExpressions.cpp",
-        "angle/src/compiler/translator/tree_ops/msl/SeparateCompoundStructDeclarations.cpp",
         "angle/src/compiler/translator/tree_ops/msl/TransposeRowMajorMatrices.cpp",
         "angle/src/compiler/translator/tree_ops/msl/WrapMain.cpp",
         "angle/src/gpu_info_util/SystemInfo_apple.mm",
@@ -600,7 +575,6 @@ if env["platform"] == "macos" or env["platform"] == "ios":
         "angle/src/libANGLE/renderer/metal/mtl_resources.mm",
         "angle/src/libANGLE/renderer/metal/mtl_state_cache.mm",
         "angle/src/libANGLE/renderer/metal/mtl_utils.mm",
-        "angle/src/libANGLE/renderer/metal/process.cpp",
         "angle/src/libANGLE/renderer/metal/renderermtl_utils.cpp",
         "angle/src/libANGLE/renderer/gl/BlitGL.cpp",
         "angle/src/libANGLE/renderer/gl/BufferGL.cpp",
@@ -614,7 +588,6 @@ if env["platform"] == "macos" or env["platform"] == "ios":
         "angle/src/libANGLE/renderer/gl/FunctionsGL.cpp",
         "angle/src/libANGLE/renderer/gl/ImageGL.cpp",
         "angle/src/libANGLE/renderer/gl/MemoryObjectGL.cpp",
-        "angle/src/libANGLE/renderer/gl/PLSProgramCache.cpp",
         "angle/src/libANGLE/renderer/gl/ProgramExecutableGL.cpp",
         "angle/src/libANGLE/renderer/gl/ProgramGL.cpp",
         "angle/src/libANGLE/renderer/gl/ProgramPipelineGL.cpp",
@@ -742,6 +715,7 @@ angle_sources_egl = [
 angle_sources_gles = [
     "angle/src/libGLESv2/egl_ext_stubs.cpp",
     "angle/src/libGLESv2/egl_stubs.cpp",
+    "angle/src/libGLESv2/egl_stubs_getprocaddress_autogen.cpp",
     "angle/src/libGLESv2/entry_points_egl_autogen.cpp",
     "angle/src/libGLESv2/entry_points_egl_ext_autogen.cpp",
     "angle/src/libGLESv2/entry_points_gles_1_0_autogen.cpp",
@@ -752,7 +726,6 @@ angle_sources_gles = [
     "angle/src/libGLESv2/entry_points_gles_ext_autogen.cpp",
     "angle/src/libGLESv2/global_state.cpp",
     "angle/src/libGLESv2/libGLESv2_autogen.cpp",
-    "angle/src/libGLESv2/proc_table_egl_autogen.cpp",
 ]
 env.Append(CPPDEFINES=[("ANGLE_CAPTURE_ENABLED", 0)])
 env.Append(CPPDEFINES=[("ANGLE_ENABLE_ESSL", 1)])
@@ -797,7 +770,6 @@ if env["platform"] == "ios":
     else:
         env.Append(CPPDEFINES=["ANGLE_PLATFORM_IOS_FAMILY_SIMULATOR"])
     env.Append(CPPDEFINES=[("ANGLE_ENABLE_METAL", 1)])
-    env.Append(CPPDEFINES=[("ANGLE_ENABLE_OPENGL", 1)])
     env.Append(CPPDEFINES=[("ANGLE_ENABLE_GL_NULL", 1)])
     env.Append(CPPDEFINES=[("ANGLE_ENABLE_EAGL", 1)])
     env.Append(CPPDEFINES=[("GLES_SILENCE_DEPRECATION", 1)])

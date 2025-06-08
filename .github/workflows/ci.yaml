@@ -177,7 +177,7 @@ jobs:
       - name: Setup MinGW/LLVM
         if: ${{ matrix.platform == 'windows' && matrix.llvm == 'yes' }}
         run: |
-          curl -L -O https://github.com/mstorsjo/llvm-mingw/releases/download/20240619/llvm-mingw-20240619-ucrt-x86_64.zip
+          curl -L -O https://github.com/mstorsjo/llvm-mingw/releases/download/20250114/llvm-mingw-20250114-ucrt-x86_64.zip
           unzip -q llvm-mingw-*.zip
           rm llvm-mingw-*.zip
           mv llvm-mingw-* "$HOME/llvm-mingw"
