@@ -28,7 +28,7 @@ index 0e64f78d53..17ed63e66c 100644
      mHostVisual.As(&visual);
  
      ABI::Windows::Foundation::Numerics::Vector2 size;
-+#if defined(MINGW_ENABLED)
++#if defined(MINGW_ENABLED) && (__MINGW64_VERSION_MAJOR < 13)
 +    HRESULT hr = visual->get_Size((ABI::Windows::UI::Composition::Vector2*)&size);
 +#else
      HRESULT hr = visual->get_Size(&size);
@@ -39,7 +39,7 @@ index 0e64f78d53..17ed63e66c 100644
      }
  
      ABI::Windows::Foundation::Numerics::Vector3 offset;
-+#if defined(MINGW_ENABLED)
++#if defined(MINGW_ENABLED) && (__MINGW64_VERSION_MAJOR < 13)
 +    hr = visual->get_Offset((ABI::Windows::UI::Composition::Vector3*)&offset);
 +#else
      hr = visual->get_Offset(&offset);
@@ -48,10 +48,10 @@ index 0e64f78d53..17ed63e66c 100644
      {
          return false;
 diff --git a/angle/src/libANGLE/renderer/d3d/d3d11/converged/CompositorNativeWindow11.h b/angle/src/libANGLE/renderer/d3d/d3d11/converged/CompositorNativeWindow11.h
-index aec331a76c..be98814486 100644
+index 688f937724..8f3232cc72 100644
 --- a/angle/src/libANGLE/renderer/d3d/d3d11/converged/CompositorNativeWindow11.h
 +++ b/angle/src/libANGLE/renderer/d3d/d3d11/converged/CompositorNativeWindow11.h
-@@ -12,6 +12,143 @@
+@@ -12,6 +12,147 @@
  
  #include "libANGLE/renderer/d3d/d3d11/NativeWindow11.h"
  
@@ -192,19 +192,10 @@ index aec331a76c..be98814486 100644
 +#endif
 +#endif
 +
- #include <dispatcherqueue.h>
++#if defined(MINGW_ENABLED) && (__MINGW64_VERSION_MAJOR == 13)
++#define ____FIReference_1_BYTE_INTERFACE_DEFINED__
++#endif
++
+ #include <DispatcherQueue.h>
  #include <windows.foundation.metadata.h>
  #include <windows.ui.composition.h>
-diff --git a/third_party/zlib/cpu_features.c b/third_party/zlib/cpu_features.c
-index 64e0428..1332971 100644
---- a/third_party/zlib/cpu_features.c
-+++ b/third_party/zlib/cpu_features.c
-@@ -11,7 +11,7 @@
- #include <stdint.h>
- #if defined(_MSC_VER)
- #include <intrin.h>
--#elif defined(ADLER32_SIMD_SSSE3)
-+#elif defined(ADLER32_SIMD_SSSE3) || (defined(MINGW_ENABLED) && (defined(__i386__) || defined(__x86_64__)))
- #include <cpuid.h>
- #endif
- 
