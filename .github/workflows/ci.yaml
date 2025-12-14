@@ -14,8 +14,8 @@ jobs:
         # macOS and iOS
         - name: 🍎 macOS x86_64
           platform: macos
-          os: macos-13
-          xcode: "15.0"
+          os: macos-latest
+          xcode: "26.1.1"
           artifact-name: godot-angle-static-x86_64-macos-release
           artifact-path-angle: bin/libANGLE.macos.x86_64.a
           artifact-path-egl: bin/libEGL.macos.x86_64.a
@@ -24,8 +24,8 @@ jobs:
 
         - name: 🍎 macOS arm64
           platform: macos
-          os: macos-13
-          xcode: "15.0"
+          os: macos-latest
+          xcode: "26.1.1"
           artifact-name: godot-angle-static-arm64-macos-release
           artifact-path-angle: bin/libANGLE.macos.arm64.a
           artifact-path-egl: bin/libEGL.macos.arm64.a
@@ -34,8 +34,8 @@ jobs:
 
         - name: 🍏 iOS x86_64 simulator
           platform: ios
-          os: macos-13
-          xcode: "15.0"
+          os: macos-latest
+          xcode: "26.1.1"
           artifact-name: godot-angle-static-x86_64-ios-sim-release
           artifact-path-angle: bin/libANGLE.ios.x86_64.simulator.a
           artifact-path-egl: bin/libEGL.ios.x86_64.simulator.a
@@ -44,8 +44,8 @@ jobs:
 
         - name: 🍏 iOS arm64 simulator
           platform: ios
-          os: macos-13
-          xcode: "15.0"
+          os: macos-latest
+          xcode: "26.1.1"
           artifact-name: godot-angle-static-arm64-ios-sim-release
           artifact-path-angle: bin/libANGLE.ios.arm64.simulator.a
           artifact-path-egl: bin/libEGL.ios.arm64.simulator.a
@@ -54,8 +54,8 @@ jobs:
 
         - name: 🍏 iOS arm64 device
           platform: ios
-          os: macos-13
-          xcode: "15.0"
+          os: macos-latest
+          xcode: "26.1.1"
           artifact-name: godot-angle-static-arm64-ios-release
           artifact-path-angle: bin/libANGLE.ios.arm64.a
           artifact-path-egl: bin/libEGL.ios.arm64.a
@@ -65,7 +65,7 @@ jobs:
         # MinGW/LLVM libs using UCRT
         - name: 🏁 Windows - MinGW/LLVM (UCRT) x86_64
           platform: windows
-          os: windows-2019
+          os: windows-2025
           artifact-name: godot-angle-static-x86_64-llvm-release
           artifact-path-angle: bin/libANGLE.windows.x86_64.a
           artifact-path-egl: bin/libEGL.windows.x86_64.a
@@ -75,7 +75,7 @@ jobs:
 
         - name: 🏁 Windows - MinGW/LLVM (UCRT) x86_32
           platform: windows
-          os: windows-2019
+          os: windows-2025
           artifact-name: godot-angle-static-x86_32-llvm-release
           artifact-path-angle: bin/libANGLE.windows.x86_32.a
           artifact-path-egl: bin/libEGL.windows.x86_32.a
@@ -85,7 +85,7 @@ jobs:
 
         - name: 🏁 Windows - MinGW/LLVM (UCRT) arm64
           platform: windows
-          os: windows-2019
+          os: windows-2025
           artifact-name: godot-angle-static-arm64-llvm-release
           artifact-path-angle: bin/libANGLE.windows.arm64.a
           artifact-path-egl: bin/libEGL.windows.arm64.a
@@ -96,7 +96,7 @@ jobs:
         # MSVC libs
         - name: 🏁 Windows - MSVC x86_64
           platform: windows
-          os: windows-2019
+          os: windows-2025
           artifact-name: godot-angle-static-x86_64-msvc-release
           artifact-path-angle: bin/libANGLE.windows.x86_64.lib
           artifact-path-egl: bin/libEGL.windows.x86_64.lib
@@ -105,7 +105,7 @@ jobs:
 
         - name: 🏁 Windows - MSVC x86_32
           platform: windows
-          os: windows-2019
+          os: windows-2025
           artifact-name: godot-angle-static-x86_32-msvc-release
           artifact-path-angle: bin/libANGLE.windows.x86_32.lib
           artifact-path-egl: bin/libEGL.windows.x86_32.lib
@@ -114,18 +114,18 @@ jobs:
 
         - name: 🏁 Windows - MSVC arm64
           platform: windows
-          os: windows-2019
+          os: windows-2025
           artifact-name: godot-angle-static-arm64-msvc-release
           artifact-path-angle: bin/libANGLE.windows.arm64.lib
           artifact-path-egl: bin/libEGL.windows.arm64.lib
           artifact-path-gles: bin/libGLES.windows.arm64.lib
           flags: use_mingw=no arch=arm64
 
-        # MinGW/GCC libs using MSVCRT
+        # MinGW/GCC libs using MSVCRT (MinGW 15 / CRT 13)
         - name: 🏁 Windows - MinGW/GCC (MSVCRT) x86_64
           platform: windows
           os: windows-2025
-          artifact-name: godot-angle-static-x86_64-gcc-release
+          artifact-name: godot-angle-static-x86_64-gcc-13-release
           artifact-path-angle: bin/libANGLE.windows.x86_64.a
           artifact-path-egl: bin/libEGL.windows.x86_64.a
           artifact-path-gles: bin/libGLES.windows.x86_64.a
@@ -137,7 +137,7 @@ jobs:
         - name: 🏁 Windows - MinGW/GCC (MSVCRT) x86_32
           platform: windows
           os: windows-2025
-          artifact-name: godot-angle-static-x86_32-gcc-release
+          artifact-name: godot-angle-static-x86_32-gcc-13-release
           artifact-path-angle: bin/libANGLE.windows.x86_32.a
           artifact-path-egl: bin/libEGL.windows.x86_32.a
           artifact-path-gles: bin/libGLES.windows.x86_32.a
@@ -146,6 +146,31 @@ jobs:
           msys: mingw32
           msysenv: i686
 
+        # MinGW/GCC libs using MSVCRT (MinGW 14 / CRT 12)
+        - name: 🏁 Windows - MinGW/GCC (MSVCRT) x86_64
+          platform: windows
+          os: windows-2022
+          artifact-name: godot-angle-static-x86_64-gcc-release
+          artifact-path-angle: bin/libANGLE.windows.x86_64.a
+          artifact-path-egl: bin/libEGL.windows.x86_64.a
+          artifact-path-gles: bin/libGLES.windows.x86_64.a
+          flags: use_mingw=yes arch=x86_64 mingw_prefix=C:/mingw64
+          mingw: yes
+          msys: mingw64
+          msysenv: x86_64
+
+        - name: 🏁 Windows - MinGW/GCC (MSVCRT) x86_32
+          platform: windows
+          os: windows-2022
+          artifact-name: godot-angle-static-x86_32-gcc-release
+          artifact-path-angle: bin/libANGLE.windows.x86_32.a
+          artifact-path-egl: bin/libEGL.windows.x86_32.a
+          artifact-path-gles: bin/libGLES.windows.x86_32.a
+          flags: use_mingw=yes arch=x86_32 mingw_prefix=C:/mingw32
+          mingw: yes
+          msys: mingw32
+          msysenv: i686
+  
     runs-on: ${{ matrix.os }}
 
     env:
@@ -167,7 +192,7 @@ jobs:
 
       - name: Install SCons
         run: |
-          python -m pip install scons==4.0.0
+          python -m pip install scons==4.9.0
 
       - name: Install mako
         run: |
