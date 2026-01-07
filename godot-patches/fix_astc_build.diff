@@ -1,0 +1,12 @@
+diff --git a/angle/src/image_util/AstcDecompressor.h b/angle/src/image_util/AstcDecompressor.h
+index f272d0feaa..dc9243b1e5 100644
+--- a/angle/src/image_util/AstcDecompressor.h
++++ b/angle/src/image_util/AstcDecompressor.h
+@@ -11,6 +11,7 @@
+ 
+ #include <memory>
+ #include <string>
++#include <cstdint>
+ 
+ namespace angle
+ {
