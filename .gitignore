@@ -2,3 +2,11 @@
 bin/
 godot-angle/
 *.pyc
+
+*.o
+*.obj
+
+.venv/
+.env/
+venv/
+env/
