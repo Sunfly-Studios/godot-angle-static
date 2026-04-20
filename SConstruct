@@ -753,6 +753,7 @@ angle_sources_gles = [
     "angle/src/libGLESv2/global_state.cpp",
     "angle/src/libGLESv2/libGLESv2_autogen.cpp",
     "angle/src/libGLESv2/proc_table_egl_autogen.cpp",
+    "angle/src/libGLESv1_CM/libGLESv1_CM.cpp",
 ]
 env.Append(CPPDEFINES=[("ANGLE_CAPTURE_ENABLED", 0)])
 env.Append(CPPDEFINES=[("ANGLE_ENABLE_ESSL", 1)])
