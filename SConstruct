@@ -734,6 +734,27 @@ if env["platform"] == "windows":
         "angle/src/libANGLE/renderer/d3d/d3d11/texture_format_table_autogen.cpp",
         "angle/src/libANGLE/renderer/d3d/d3d11/converged/CompositorNativeWindow11.cpp",
         "angle/src/libANGLE/renderer/d3d/d3d11/win32/NativeWindow11Win32.cpp",
+        "angle/src/libANGLE/renderer/d3d/d3d9/Blit9.cpp",
+        "angle/src/libANGLE/renderer/d3d/d3d9/Buffer9.cpp",
+        "angle/src/libANGLE/renderer/d3d/d3d9/Context9.cpp",
+        "angle/src/libANGLE/renderer/d3d/d3d9/DebugAnnotator9.cpp",
+        "angle/src/libANGLE/renderer/d3d/d3d9/Device9.cpp",
+        "angle/src/libANGLE/renderer/d3d/d3d9/Fence9.cpp",
+        "angle/src/libANGLE/renderer/d3d/d3d9/Framebuffer9.cpp",
+        "angle/src/libANGLE/renderer/d3d/d3d9/Image9.cpp",
+        "angle/src/libANGLE/renderer/d3d/d3d9/IndexBuffer9.cpp",
+        "angle/src/libANGLE/renderer/d3d/d3d9/NativeWindow9.cpp",
+        "angle/src/libANGLE/renderer/d3d/d3d9/Query9.cpp",
+        "angle/src/libANGLE/renderer/d3d/d3d9/Renderer9.cpp",
+        "angle/src/libANGLE/renderer/d3d/d3d9/RenderTarget9.cpp",
+        "angle/src/libANGLE/renderer/d3d/d3d9/ShaderExecutable9.cpp",
+        "angle/src/libANGLE/renderer/d3d/d3d9/StateManager9.cpp",
+        "angle/src/libANGLE/renderer/d3d/d3d9/SwapChain9.cpp",
+        "angle/src/libANGLE/renderer/d3d/d3d9/TextureStorage9.cpp",
+        "angle/src/libANGLE/renderer/d3d/d3d9/VertexBuffer9.cpp",
+        "angle/src/libANGLE/renderer/d3d/d3d9/VertexDeclarationCache.cpp",
+        "angle/src/libANGLE/renderer/d3d/d3d9/formatutils9.cpp",
+        "angle/src/libANGLE/renderer/d3d/d3d9/renderer9_utils.cpp",
     ]
 angle_sources_egl = [
     "angle/src/libEGL/egl_loader_autogen.cpp",
@@ -788,6 +809,7 @@ if env["platform"] == "windows":
     )
     env.Append(CPPDEFINES=[("ANGLE_ENABLE_D3D11", 1)])
     env.Append(CPPDEFINES=[("ANGLE_ENABLE_D3D11_COMPOSITOR_NATIVE_WINDOW", 1)])
+    env.Append(CPPDEFINES=[("ANGLE_ENABLE_D3D9", 1)])
     env.Append(CPPDEFINES=[("ANGLE_ENABLE_HLSL", 1)])
     env.Append(CPPDEFINES=[("NOMINMAX", 1)])
     env.Append(CPPDEFINES=[("X86_WINDOWS", 1)])
