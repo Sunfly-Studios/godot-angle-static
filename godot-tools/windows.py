@@ -68,6 +68,9 @@ def generate(env):
             else:
                 env["CC"] = "clang-cl"
                 env["CXX"] = "clang-cl"
+            
+            if env["arch"] == "x86_32":
+                env.Append(CCFLAGS=["-m32"])
 
     elif (sys.platform == "win32" or sys.platform == "msys") and not env["mingw_prefix"]:
         env["use_mingw"] = True
