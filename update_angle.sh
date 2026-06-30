@@ -46,8 +46,3 @@ if [ -d ./godot-angle ]; then
 fi
 
 run_custom_steps_at_source
-
-if [ -d ./godot-patches ]; then
-    echo "Applying patches"
-    find ./godot-patches -name '*.diff' -exec git apply {} \;
-fi
